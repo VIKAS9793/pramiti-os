@@ -1,0 +1,33 @@
+# OEM-Verified Exact Dependency Lock (Pramiti OS Sprint 1)
+# Generated from: .venv\Scripts\pip show <package> after successful install
+# DO NOT downgrade these versions — compatibility matrix is tested.
+
+# MCP Server Runtime
+mcp==1.28.1
+
+# Core AI Orchestration
+langgraph==1.2.9
+langchain-core==1.5.1
+langchain-community==0.4.2
+
+# LLM Integrations (PoC: Groq Cloud / Fallback: Ollama Local)
+langchain-groq==1.1.3
+langchain-ollama==1.1.0
+
+# Type Safety & Validation & Settings
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# API Bridge
+fastapi>=0.100.0
+uvicorn>=0.22.0
+sse-starlette>=1.6.0
+
+# Secrets Management
+python-dotenv==1.2.2
+
+# Testing
+pytest==9.1.1
+
+# Vector Database
+qdrant-client[fastembed]>=1.7.0

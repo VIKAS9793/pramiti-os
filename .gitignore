@@ -1,0 +1,81 @@
+# ==============================================================================
+# Pramiti OS - .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Antigravity IDE & Agent Internal Files
+# ------------------------------------------------------------------------------
+# Ignore workspace-specific agent skills, configurations, and logs
+.agents/
+.gemini/
+.antigravity/
+.system_generated/
+scratch/
+# Ignore any artifacts or temporary workflow/planning documents not part of the source
+*implementation_plan.md
+*task.md
+*walkthrough.md
+
+# ------------------------------------------------------------------------------
+# 2. Virtual Environments & Node Modules
+# ------------------------------------------------------------------------------
+venv/
+.venv/
+env/
+.env_python/
+Lib/
+Scripts/
+node_modules/
+.next/
+
+# ------------------------------------------------------------------------------
+# 3. Python & Caches
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ------------------------------------------------------------------------------
+# 4. Secrets, Tokens & Environment Variables
+# ------------------------------------------------------------------------------
+# MUST NOT COMMIT SECRETS
+.env
+.env.local
+.env.*
+*.pem
+*.key
+*.cert
+*.crt
+client_secrets.json
+credentials.json
+
+# ------------------------------------------------------------------------------
+# 5. OS & Standard IDE Files
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~

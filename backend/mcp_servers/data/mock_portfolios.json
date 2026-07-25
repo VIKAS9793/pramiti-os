@@ -1,0 +1,310 @@
+[
+  {
+    "client_id": "CLI-1001",
+    "description": "EDGE CASE: The 'Happy Path' Core-and-Satellite HNI. Fully compliant, well-diversified across MFs, PMS, and Bonds.",
+    "core_identity": {
+      "name": "Aarav Sharma",
+      "tier": "Private Wealth - Tier 1",
+      "kyc_status": "Verified - KRA Validated",
+      "risk_appetite": "Moderate-Aggressive",
+      "age": 45
+    },
+    "portfolio_health": {
+      "total_aum_inr": 48500000,
+      "unrealized_pnl_inr": 6300000,
+      "unrealized_pnl_pct": 14.9
+    },
+    "allocation": {
+      "equity_pct": 65,
+      "debt_pct": 25,
+      "alternatives_pct": 5,
+      "cash_pct": 5
+    },
+    "holdings": [
+      { "asset_name": "Parag Parikh Flexi Cap Fund - Direct Growth", "category": "Equity MF", "current_value_inr": 12000000, "allocation_pct": 24.7, "sip_active": true, "sip_amount": 100000 },
+      { "asset_name": "ASK Indian Entrepreneur Portfolio (PMS)", "category": "Equity PMS", "current_value_inr": 15000000, "allocation_pct": 30.9, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "HDFC Bank Ltd", "category": "Direct Equity", "current_value_inr": 4500000, "allocation_pct": 9.3, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "RBI Floating Rate Savings Bond 2020", "category": "Govt Debt", "current_value_inr": 8000000, "allocation_pct": 16.5, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Sovereign Gold Bond (SGB) Series IV", "category": "Debt/Commodity", "current_value_inr": 4000000, "allocation_pct": 8.2, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Embassy Office Parks REIT", "category": "Alternatives", "current_value_inr": 2500000, "allocation_pct": 5.2, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Nippon India Liquid Fund", "category": "Cash Equivalent", "current_value_inr": 2500000, "allocation_pct": 5.2, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 100000,
+      "next_sip_date": "2026-08-15",
+      "sip_status": "Active"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "Tax Harvesting Deadline: Mar 31",
+      "recent_interaction": "Last Call: 14 days ago (Discussed adding Cat-II AIF exposure)",
+      "flags": []
+    }
+  },
+  {
+    "client_id": "CLI-1002",
+    "description": "EDGE CASE: The 'Compliance Blocked' Client. KYC pending, preventing SIP execution.",
+    "core_identity": {
+      "name": "Meera Patel",
+      "tier": "Wealth - Tier 2",
+      "kyc_status": "Action Required: Aadhaar-PAN Linkage Pending",
+      "risk_appetite": "Aggressive",
+      "age": 38
+    },
+    "portfolio_health": {
+      "total_aum_inr": 12500000,
+      "unrealized_pnl_inr": 2200000,
+      "unrealized_pnl_pct": 21.3
+    },
+    "allocation": {
+      "equity_pct": 85,
+      "debt_pct": 10,
+      "alternatives_pct": 0,
+      "cash_pct": 5
+    },
+    "holdings": [
+      { "asset_name": "Nippon India Small Cap Fund - Growth", "category": "Equity MF", "current_value_inr": 6500000, "allocation_pct": 52.0, "sip_active": true, "sip_amount": 50000 },
+      { "asset_name": "Motilal Oswal Midcap Fund", "category": "Equity MF", "current_value_inr": 4125000, "allocation_pct": 33.0, "sip_active": true, "sip_amount": 50000 },
+      { "asset_name": "Bajaj Finance NCD (8.5%)", "category": "Corporate Debt", "current_value_inr": 1250000, "allocation_pct": 10.0, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "SBI Savings Account (Linked)", "category": "Cash", "current_value_inr": 625000, "allocation_pct": 5.0, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 100000,
+      "next_sip_date": "2026-08-05",
+      "sip_status": "Paused - KYC Hold (Folio Frozen)"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "KYC Deadline: Aug 30 (SIPs will be cancelled)",
+      "recent_interaction": "Last Call: 3 days ago (Sent CAMS KRA update link)",
+      "flags": ["KYC_BLOCKED", "SIP_AT_RISK"]
+    }
+  },
+  {
+    "client_id": "CLI-1003",
+    "description": "EDGE CASE: The 'Over-Concentrated / Market Shock' Client. High risk direct equity exposure.",
+    "core_identity": {
+      "name": "Vikram Desai",
+      "tier": "Ultra HNI - Family Office",
+      "kyc_status": "Verified",
+      "risk_appetite": "Very Aggressive",
+      "age": 52
+    },
+    "portfolio_health": {
+      "total_aum_inr": 115000000,
+      "unrealized_pnl_inr": -18500000,
+      "unrealized_pnl_pct": -13.8
+    },
+    "allocation": {
+      "equity_pct": 92,
+      "debt_pct": 0,
+      "alternatives_pct": 6,
+      "cash_pct": 2
+    },
+    "holdings": [
+      { "asset_name": "Adani Enterprises Ltd", "category": "Direct Equity", "current_value_inr": 45000000, "allocation_pct": 39.1, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Paytm (One97 Communications)", "category": "Direct Equity", "current_value_inr": 15000000, "allocation_pct": 13.0, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Zomato Ltd", "category": "Direct Equity", "current_value_inr": 35000000, "allocation_pct": 30.4, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "HDFC AMC Select AIF (Cat III)", "category": "Alternatives", "current_value_inr": 10800000, "allocation_pct": 9.4, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Kotak Liquid Fund", "category": "Cash Equivalent", "current_value_inr": 9200000, "allocation_pct": 8.0, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 0,
+      "next_sip_date": null,
+      "sip_status": "Inactive"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "Margin Call Review: Ongoing",
+      "recent_interaction": "Last Call: 45 days ago (Refused to diversify out of promoter group stocks)",
+      "flags": ["HIGH_CONCENTRATION_RISK", "SEVERE_DRAWDOWN", "DIRECT_EQUITY_HEAVY"]
+    }
+  },
+  {
+    "client_id": "CLI-1004",
+    "description": "EDGE CASE: The 'Cash Drag' Client. High fixed income allocation despite moderate risk profile.",
+    "core_identity": {
+      "name": "Ananya Iyer",
+      "tier": "Wealth - Tier 2",
+      "kyc_status": "Verified",
+      "risk_appetite": "Moderate",
+      "age": 61
+    },
+    "portfolio_health": {
+      "total_aum_inr": 28000000,
+      "unrealized_pnl_inr": 1250000,
+      "unrealized_pnl_pct": 4.6
+    },
+    "allocation": {
+      "equity_pct": 15,
+      "debt_pct": 60,
+      "alternatives_pct": 0,
+      "cash_pct": 25
+    },
+    "holdings": [
+      { "asset_name": "SBI Bluechip Fund", "category": "Equity MF", "current_value_inr": 4200000, "allocation_pct": 15.0, "sip_active": true, "sip_amount": 25000 },
+      { "asset_name": "ICICI Bank Fixed Deposit (7.1%)", "category": "Fixed Deposit", "current_value_inr": 12000000, "allocation_pct": 42.8, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Post Office Senior Citizen Savings Scheme (SCSS)", "category": "Govt Debt", "current_value_inr": 4800000, "allocation_pct": 17.2, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "ICICI Prudential Liquid Fund", "category": "Cash Equivalent", "current_value_inr": 7000000, "allocation_pct": 25.0, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 25000,
+      "next_sip_date": "2026-08-10",
+      "sip_status": "Active"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "ICICI FD Maturity: Oct 01 (₹1.2 Cr)",
+      "recent_interaction": "Last Call: 60 days ago (Client worried about inflation beating returns)",
+      "flags": ["CASH_DRAG", "OPPORTUNITY_DEPLOYMENT_UPCOMING"]
+    }
+  },
+  {
+    "client_id": "CLI-1005",
+    "description": "EDGE CASE: Low Financial Literacy. Heavy reliance on toxic traditional products (ULIPs/Endowment) and negative real returns.",
+    "core_identity": {
+      "name": "Rajesh Kumar",
+      "tier": "Retail",
+      "kyc_status": "Verified",
+      "risk_appetite": "Very Conservative",
+      "age": 48
+    },
+    "portfolio_health": {
+      "total_aum_inr": 1850000,
+      "unrealized_pnl_inr": 85000,
+      "unrealized_pnl_pct": 4.8
+    },
+    "allocation": {
+      "equity_pct": 0,
+      "debt_pct": 20,
+      "alternatives_pct": 0,
+      "cash_pct": 80
+    },
+    "holdings": [
+      { "asset_name": "LIC Jeevan Anand (Endowment)", "category": "Insurance/Traditional", "current_value_inr": 800000, "allocation_pct": 43.2, "sip_active": true, "sip_amount": 10000 },
+      { "asset_name": "SBI Regular Savings Fund - Regular Plan", "category": "Debt MF (High Comm.)", "current_value_inr": 350000, "allocation_pct": 18.9, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Post Office Monthly Income Scheme", "category": "Govt Debt", "current_value_inr": 700000, "allocation_pct": 37.8, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 10000,
+      "next_sip_date": "2026-08-28",
+      "sip_status": "Active (Insurance Premium)"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "LIC Premium Due: Aug 28",
+      "recent_interaction": "Last Call: 120 days ago (Client refused to move money to equity due to fear of loss)",
+      "flags": ["INFLATION_NEGATIVE_RETURNS", "TOXIC_PRODUCT_ULIP_ENDOWMENT"]
+    }
+  },
+  {
+    "client_id": "CLI-1006",
+    "description": "EDGE CASE: The Rookie F&O Gambler. Severe capital destruction chasing tips, holding penny stocks.",
+    "core_identity": {
+      "name": "Rahul Verma",
+      "tier": "Retail",
+      "kyc_status": "Verified",
+      "risk_appetite": "Very Aggressive",
+      "age": 26
+    },
+    "portfolio_health": {
+      "total_aum_inr": 350000,
+      "unrealized_pnl_inr": -850000,
+      "unrealized_pnl_pct": -70.8
+    },
+    "allocation": {
+      "equity_pct": 95,
+      "debt_pct": 0,
+      "alternatives_pct": 5,
+      "cash_pct": 0
+    },
+    "holdings": [
+      { "asset_name": "Yes Bank Ltd", "category": "Direct Equity (Penny)", "current_value_inr": 150000, "allocation_pct": 42.8, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Vodafone Idea Ltd", "category": "Direct Equity (Penny)", "current_value_inr": 180000, "allocation_pct": 51.4, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Nifty Bank Weekly Call Options (OTM)", "category": "Derivatives (F&O)", "current_value_inr": 20000, "allocation_pct": 5.7, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 0,
+      "next_sip_date": null,
+      "sip_status": "Inactive"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "Option Expiry: Coming Thursday",
+      "recent_interaction": "Last Call: 2 days ago (Client asked for loan against mutual funds to trade options)",
+      "flags": ["F&O_TRAP", "SEVERE_CAPITAL_DESTRUCTION", "FINFLUENCER_RISK"]
+    }
+  },
+  {
+    "client_id": "CLI-1007",
+    "description": "EDGE CASE: The Veteran/Legacy Wealth. Huge wealth but stuck in physical shares, regulatory hurdles.",
+    "core_identity": {
+      "name": "Narayanan Srinivasan",
+      "tier": "HNI",
+      "kyc_status": "Action Required: Re-KYC / FATCA",
+      "risk_appetite": "Moderate",
+      "age": 75
+    },
+    "portfolio_health": {
+      "total_aum_inr": 85000000,
+      "unrealized_pnl_inr": 72000000,
+      "unrealized_pnl_pct": 553.8
+    },
+    "allocation": {
+      "equity_pct": 80,
+      "debt_pct": 0,
+      "alternatives_pct": 18,
+      "cash_pct": 2
+    },
+    "holdings": [
+      { "asset_name": "ITC Ltd (Physical Shares)", "category": "Direct Equity", "current_value_inr": 35000000, "allocation_pct": 41.1, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Larsen & Toubro (L&T) (Physical Shares)", "category": "Direct Equity", "current_value_inr": 33000000, "allocation_pct": 38.8, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Ancestral Gold (Sovereign)", "category": "Commodity", "current_value_inr": 15000000, "allocation_pct": 17.6, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "Canara Bank Savings", "category": "Cash", "current_value_inr": 2000000, "allocation_pct": 2.3, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 0,
+      "next_sip_date": null,
+      "sip_status": "Inactive"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "IEPF Transfer Warning: Dividend Unclaimed for 6 years",
+      "recent_interaction": "Last Call: 1 year ago",
+      "flags": ["PHYSICAL_SHARES_RISK", "TRANSMISSION_RISK_NO_NOMINEE", "RE_KYC_DUE"]
+    }
+  },
+  {
+    "client_id": "CLI-1008",
+    "description": "EDGE CASE: DIY Mass Affluent. 'Mutual Fund Zoo' - severely over-diversified, tracking errors.",
+    "core_identity": {
+      "name": "Priya Sharma",
+      "tier": "Mass Affluent",
+      "kyc_status": "Verified",
+      "risk_appetite": "Aggressive",
+      "age": 34
+    },
+    "portfolio_health": {
+      "total_aum_inr": 4200000,
+      "unrealized_pnl_inr": 510000,
+      "unrealized_pnl_pct": 13.8
+    },
+    "allocation": {
+      "equity_pct": 90,
+      "debt_pct": 5,
+      "alternatives_pct": 0,
+      "cash_pct": 5
+    },
+    "holdings": [
+      { "asset_name": "UTI Nifty 50 Index Fund", "category": "Equity MF", "current_value_inr": 800000, "allocation_pct": 19.0, "sip_active": true, "sip_amount": 10000 },
+      { "asset_name": "HDFC Index Fund Nifty 50 Plan", "category": "Equity MF", "current_value_inr": 700000, "allocation_pct": 16.6, "sip_active": true, "sip_amount": 10000 },
+      { "asset_name": "ICICI Pru Nifty 50 Index Fund", "category": "Equity MF", "current_value_inr": 600000, "allocation_pct": 14.2, "sip_active": true, "sip_amount": 10000 },
+      { "asset_name": "Quant Small Cap Fund", "category": "Equity MF", "current_value_inr": 1100000, "allocation_pct": 26.1, "sip_active": true, "sip_amount": 15000 },
+      { "asset_name": "Axis Bluechip Fund", "category": "Equity MF", "current_value_inr": 580000, "allocation_pct": 13.8, "sip_active": false, "sip_amount": 0 },
+      { "asset_name": "PPF (Public Provident Fund)", "category": "Govt Debt", "current_value_inr": 210000, "allocation_pct": 5.0, "sip_active": false, "sip_amount": 0 }
+    ],
+    "sip_details": {
+      "total_monthly_sip_inr": 45000,
+      "next_sip_date": "2026-08-01",
+      "sip_status": "Active"
+    },
+    "actionable_intelligence": {
+      "next_important_date": "N/A",
+      "recent_interaction": "Last Call: 10 days ago (Discussed why returns are lagging Nifty despite 90% equity)",
+      "flags": ["OVER_DIVERSIFICATION", "MF_ZOO_PORTFOLIO", "HIGH_OVERLAP"]
+    }
+  }
+]
