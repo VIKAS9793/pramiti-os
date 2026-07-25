@@ -36,6 +36,8 @@ PRODUCTION_BLOCKED_VARS = [
 # 2. PROMPT INJECTION ATTACK PATTERNS
 # These patterns cover common adversarial attack vectors against LLM pipelines.
 # Reference: OWASP Top 10 for LLM Applications (LLM01: Prompt Injection)
+# NOTE: This regex-based scanner is layer one of defense-in-depth, not the 
+# sole safeguard against adversarial prompting.
 # ---------------------------------------------------------------------------
 INJECTION_PATTERNS = [
     # Direct instruction hijacking

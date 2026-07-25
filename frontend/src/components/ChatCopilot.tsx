@@ -16,12 +16,14 @@ interface Message {
 interface ChatCopilotProps {
   selectedClient: string;
   messages: Message[];
+  setMessages: (updater: (prev: Message[]) => Message[]) => void;
   inputValue: string;
   setInputValue: (val: string) => void;
   isProcessing: boolean;
   requiresApproval: boolean;
-  handleSend: (overrideValue?: string) => void;
-  setViewMode: (mode: 'cockpit' | 'slider_drawer') => void;
+  setRequiresApproval: (val: boolean) => void;
+  handleSend: (msg?: string) => void;
+  setViewMode: (mode: 'cockpit' | 'drift_detail' | 'slider_drawer' | 'chat') => void;
 }
 
 /**
@@ -81,17 +83,22 @@ export function ChatCopilot({
   return (
     <div className={styles.chatContainer}>
       <div className={styles.contextStrip}>
-        Reviewing: {selectedClient} — Equity 15% overweight — started 3 min ago
+        Client Context: {selectedClient} — {
+          selectedClient === 'Aarav Sharma' ? 'Equity Allocation Breach (15% overweight)' :
+          selectedClient === 'Priya Patel' ? '₹25.00 Lakh awaiting deployment' :
+          selectedClient === 'Kabir Singh' ? 'SIP payment pending — auto-retry 07 Aug' :
+          'Review Required'
+        }
       </div>
 
       <div className={styles.actionChips}>
-        <button className={styles.chip} onClick={() => handleSend("Draft a rebalancing proposal")} disabled={requiresApproval || isProcessing}>
+        <button className={styles.chip} onClick={() => handleSend(`Draft a rebalancing proposal for ${selectedClient}`)} disabled={requiresApproval || isProcessing}>
           ⚡ Draft Rebalancing Proposal
         </button>
-        <button className={styles.chip} onClick={() => handleSend("Prep a SIP reminder for the client")} disabled={requiresApproval || isProcessing}>
-          ⚡ Prep SIP Reminder
+        <button className={styles.chip} onClick={() => handleSend(`Generate a 3-bullet WhatsApp summary of the rebalancing plan for ${selectedClient}`)} disabled={requiresApproval || isProcessing}>
+          ⚡ WhatsApp Summary
         </button>
-        <button className={styles.chip} onClick={() => handleSend("Generate a tax summary report")} disabled={requiresApproval || isProcessing}>
+        <button className={styles.chip} onClick={() => handleSend(`Generate a tax summary report for ${selectedClient}`)} disabled={requiresApproval || isProcessing}>
           ⚡ Generate Tax Summary
         </button>
       </div>
@@ -142,8 +149,20 @@ export function ChatCopilot({
                   )}
 
                   <div className={styles.proposalActions}>
-                    <Button variant="primary-small" onClick={() => setViewMode('cockpit')}>
-                      Confirm Rebalancing
+                    <Button variant="primary-small" onClick={() => {
+                      setRequiresApproval(false);
+                      setMessages(prev => [...prev, {
+                        id: Date.now().toString(),
+                        role: 'system',
+                        content: '✅ **RM Approval Recorded.** Executing trades to Core Banking System...'
+                      }]);
+                    }}>
+                      Confirm & Execute
+                    </Button>
+                    <Button variant="secondary-small" onClick={() => {
+                      setRequiresApproval(false);
+                    }}>
+                      Reject / Modify
                     </Button>
                     <Button variant="secondary-small" onClick={() => setViewMode('slider_drawer')}>
                       Adjust Amount
@@ -180,14 +199,14 @@ export function ChatCopilot({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask about the portfolio or draft a proposal..."
+            placeholder="Select a quick action above, or type your query..."
             className={styles.input}
-            disabled={requiresApproval || isProcessing}
+            disabled={isProcessing}
           />
           <button
             onClick={() => handleSend()}
             className={styles.sendBtn}
-            disabled={requiresApproval || isProcessing || !inputValue.trim()}
+            disabled={isProcessing || !inputValue.trim()}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />

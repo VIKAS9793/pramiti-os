@@ -1,0 +1,269 @@
+{
+  "version": "1",
+  "pip_version": "26.1.2",
+  "install": [
+    {
+      "download_info": {
+        "url": "https://files.pythonhosted.org/packages/2f/cd/eff9b82bc3b5f62d481b437099f44f3ef7b1d907f166fb4ee25e8f84a1e7/langgraph_checkpoint_postgres-3.1.0-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "814cce2ef35d792bf07b090a95eed004f1acac0724fe6605536b13f6d1e7032c"
+          },
+          "hash": "sha256=814cce2ef35d792bf07b090a95eed004f1acac0724fe6605536b13f6d1e7032c"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": true,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "langgraph-checkpoint-postgres",
+        "version": "3.1.0",
+        "summary": "Library with a Postgres implementation of LangGraph checkpoint saver.",
+        "description": "# LangGraph Checkpoint Postgres\n\nImplementation of LangGraph CheckpointSaver that uses Postgres.\n\n## Dependencies\n\nBy default `langgraph-checkpoint-postgres` installs `psycopg` (Psycopg 3) without any extras. However, you can choose a specific installation that best suits your needs [here](https://www.psycopg.org/psycopg3/docs/basic/install.html) (for example, `psycopg[binary]`).\n\n## Security\n\n> [!IMPORTANT]\n> Set `LANGGRAPH_STRICT_MSGPACK=true` or pass an explicit `allowed_msgpack_modules` list when creating your checkpointer. This restricts checkpoint deserialization to known-safe types, preventing code execution if the database is compromised. See the [langgraph-checkpoint README](https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint#serde) for details.\n\n## Usage\n\n> [!IMPORTANT]\n> When using Postgres checkpointers for the first time, make sure to call `.setup()` method on them to create required tables. See example below.\n\n> [!IMPORTANT]\n> When manually creating Postgres connections and passing them to `PostgresSaver` or `AsyncPostgresSaver`, make sure to include `autocommit=True` and `row_factory=dict_row` (`from psycopg.rows import dict_row`). See a full example in this [how-to guide](https://langchain-ai.github.io/langgraph/how-tos/persistence_postgres/).\n>\n> **Why these parameters are required:**\n> - `autocommit=True`: Required for the `.setup()` method to properly commit the checkpoint tables to the database. Without this, table creation may not be persisted.\n> - `row_factory=dict_row`: Required because the PostgresSaver implementation accesses database rows using dictionary-style syntax (e.g., `row[\"column_name\"]`). The default `tuple_row` factory returns tuples that only support index-based access (e.g., `row[0]`), which will cause `TypeError` exceptions when the checkpointer tries to access columns by name.\n>\n> **Example of incorrect usage:**\n> ```python\n> # ❌ This will fail with TypeError during checkpointer operations\n> with psycopg.connect(DB_URI) as conn:  # Missing autocommit=True and row_factory=dict_row\n>     checkpointer = PostgresSaver(conn)\n>     checkpointer.setup()  # May not persist tables properly\n>     # Any operation that reads from database will fail with:\n>     # TypeError: tuple indices must be integers or slices, not str\n> ```\n\n```python\nfrom langgraph.checkpoint.postgres import PostgresSaver\n\nwrite_config = {\"configurable\": {\"thread_id\": \"1\", \"checkpoint_ns\": \"\"}}\nread_config = {\"configurable\": {\"thread_id\": \"1\"}}\n\nDB_URI = \"postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable\"\nwith PostgresSaver.from_conn_string(DB_URI) as checkpointer:\n    # call .setup() the first time you're using the checkpointer\n    checkpointer.setup()\n    checkpoint = {\n        \"v\": 4,\n        \"ts\": \"2024-07-31T20:14:19.804150+00:00\",\n        \"id\": \"1ef4f797-8335-6428-8001-8a1503f9b875\",\n        \"channel_values\": {\n            \"my_key\": \"meow\",\n            \"node\": \"node\"\n        },\n        \"channel_versions\": {\n            \"__start__\": 2,\n            \"my_key\": 3,\n            \"start:node\": 3,\n            \"node\": 3\n        },\n        \"versions_seen\": {\n            \"__input__\": {},\n            \"__start__\": {\n            \"__start__\": 1\n            },\n            \"node\": {\n            \"start:node\": 2\n            }\n        },\n    }\n\n    # store checkpoint\n    checkpointer.put(write_config, checkpoint, {}, {})\n\n    # load checkpoint\n    checkpointer.get(read_config)\n\n    # list checkpoints\n    list(checkpointer.list(read_config))\n```\n\n### Async\n\n```python\nfrom langgraph.checkpoint.postgres.aio import AsyncPostgresSaver\n\nasync with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:\n    checkpoint = {\n        \"v\": 4,\n        \"ts\": \"2024-07-31T20:14:19.804150+00:00\",\n        \"id\": \"1ef4f797-8335-6428-8001-8a1503f9b875\",\n        \"channel_values\": {\n            \"my_key\": \"meow\",\n            \"node\": \"node\"\n        },\n        \"channel_versions\": {\n            \"__start__\": 2,\n            \"my_key\": 3,\n            \"start:node\": 3,\n            \"node\": 3\n        },\n        \"versions_seen\": {\n            \"__input__\": {},\n            \"__start__\": {\n            \"__start__\": 1\n            },\n            \"node\": {\n            \"start:node\": 2\n            }\n        },\n    }\n\n    # store checkpoint\n    await checkpointer.aput(write_config, checkpoint, {}, {})\n\n    # load checkpoint\n    await checkpointer.aget(read_config)\n\n    # list checkpoints\n    [c async for c in checkpointer.alist(read_config)]\n```\n",
+        "description_content_type": "text/markdown",
+        "license_expression": "MIT",
+        "license_file": [
+          "LICENSE"
+        ],
+        "requires_dist": [
+          "langgraph-checkpoint<5.0.0,>=4.1.0",
+          "orjson>=3.11.5",
+          "psycopg-pool>=3.2.0",
+          "psycopg>=3.2.0"
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Source, https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint-postgres",
+          "Twitter, https://x.com/langchain_oss",
+          "Slack, https://www.langchain.com/join-community",
+          "Reddit, https://www.reddit.com/r/LangChain/"
+        ]
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://files.pythonhosted.org/packages/5c/e0/7b3dee031daae7743609ce3c746565d4a3ed7c2c186479eb48e34e838c64/psycopg-3.3.4-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "b6bbc25ccf05c8fad3b061d9db2ef0909a555171b84b07f29458a447253d679a"
+          },
+          "hash": "sha256=b6bbc25ccf05c8fad3b061d9db2ef0909a555171b84b07f29458a447253d679a"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": false,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "psycopg",
+        "version": "3.3.4",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "PostgreSQL database adapter for Python",
+        "description": "Psycopg 3: PostgreSQL database adapter for Python\n=================================================\n\nPsycopg 3 is a modern implementation of a PostgreSQL adapter for Python.\n\nThis distribution contains the pure Python package ``psycopg``.\n\n.. Note::\n\n    Despite the lack of number in the package name, this package is the\n    successor of psycopg2_.\n\n    Please use the psycopg2 package if you are maintaining an existing program\n    using psycopg2 as a dependency. If you are developing something new,\n    Psycopg 3 is the most current implementation of the adapter.\n\n    .. _psycopg2: https://pypi.org/project/psycopg2/\n\n\nInstallation\n------------\n\nIn short, run the following::\n\n    pip install --upgrade pip           # to upgrade pip\n    pip install \"psycopg[binary,pool]\"  # to install package and dependencies\n\nIf something goes wrong, and for more information about installation, please\ncheck out the `Installation documentation`__.\n\n.. __: https://www.psycopg.org/psycopg3/docs/basic/install.html#\n\n\nHacking\n-------\n\nFor development information check out `the project readme`__.\n\n.. __: https://github.com/psycopg/psycopg#readme\n\n\nCopyright (C) 2020 The Psycopg Team\n",
+        "description_content_type": "text/x-rst",
+        "author_email": "Daniele Varrazzo <daniele.varrazzo@gmail.com>",
+        "license_expression": "LGPL-3.0-only",
+        "license_file": [
+          "LICENSE.txt"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Operating System :: MacOS :: MacOS X",
+          "Operating System :: Microsoft :: Windows",
+          "Operating System :: POSIX",
+          "Programming Language :: Python :: 3 :: Only",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Database",
+          "Topic :: Database :: Front-Ends",
+          "Topic :: Software Development",
+          "Topic :: Software Development :: Libraries :: Python Modules"
+        ],
+        "requires_dist": [
+          "typing-extensions>=4.6; python_version < \"3.13\"",
+          "tzdata; sys_platform == \"win32\"",
+          "psycopg-c==3.3.4; implementation_name != \"pypy\" and extra == \"c\"",
+          "psycopg-binary==3.3.4; implementation_name != \"pypy\" and extra == \"binary\"",
+          "psycopg-pool; extra == \"pool\"",
+          "anyio>=4.0; extra == \"test\"",
+          "mypy>=1.19.0; implementation_name != \"pypy\" and extra == \"test\"",
+          "pproxy>=2.7; extra == \"test\"",
+          "pytest>=6.2.5; extra == \"test\"",
+          "pytest-cov>=3.0; extra == \"test\"",
+          "pytest-randomly>=3.5; extra == \"test\"",
+          "ast-comments>=1.1.2; extra == \"dev\"",
+          "black>=26.1.0; extra == \"dev\"",
+          "codespell>=2.2; extra == \"dev\"",
+          "cython-lint>=0.16; extra == \"dev\"",
+          "dnspython>=2.1; extra == \"dev\"",
+          "flake8>=4.0; extra == \"dev\"",
+          "isort[colors]>=6.0; extra == \"dev\"",
+          "isort-psycopg; extra == \"dev\"",
+          "mypy>=1.19.0; extra == \"dev\"",
+          "pre-commit>=4.0.1; extra == \"dev\"",
+          "types-setuptools>=57.4; extra == \"dev\"",
+          "types-shapely>=2.0; extra == \"dev\"",
+          "wheel>=0.37; extra == \"dev\"",
+          "Sphinx>=9.1; extra == \"docs\"",
+          "furo==2025.12.19; extra == \"docs\"",
+          "sphinx-autobuild>=2025.8.25; extra == \"docs\"",
+          "sphinx-autodoc-typehints>=3.10.2; extra == \"docs\""
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Homepage, https://psycopg.org/",
+          "Documentation, https://psycopg.org/psycopg3/docs/",
+          "Changes, https://psycopg.org/psycopg3/docs/news.html",
+          "Code, https://github.com/psycopg/psycopg",
+          "Issue Tracker, https://github.com/psycopg/psycopg/issues",
+          "Funding, https://github.com/sponsors/dvarrazzo"
+        ],
+        "provides_extra": [
+          "c",
+          "binary",
+          "pool",
+          "test",
+          "dev",
+          "docs"
+        ]
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://files.pythonhosted.org/packages/37/ed/89c2c620af0e1660354cd8aabf9f5b21f911597ce22acb37c805d6c86bc8/psycopg_pool-3.3.1-py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "2af5b432941c4c9ad5c87b3fa410aec910ec8f7c122855897983a06c45f2e4b5"
+          },
+          "hash": "sha256=2af5b432941c4c9ad5c87b3fa410aec910ec8f7c122855897983a06c45f2e4b5"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": false,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "psycopg-pool",
+        "version": "3.3.1",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "Connection Pool for Psycopg",
+        "description": "Psycopg 3: PostgreSQL database adapter for Python - Connection Pool\n===================================================================\n\nThis distribution package is an optional component of `Psycopg 3`__: it\ncontains the optional connection pool package `psycopg_pool`__.\n\n.. __: https://pypi.org/project/psycopg/\n.. __: https://www.psycopg.org/psycopg3/docs/advanced/pool.html\n\nThis package is kept separate from the main ``psycopg`` package because it is\nlikely that it will follow a different release cycle.\n\nYou can also install this package using::\n\n    pip install \"psycopg[pool]\"\n\nPlease read `the project readme`__ and `the installation documentation`__ for\nmore details.\n\n.. __: https://github.com/psycopg/psycopg#readme\n.. __: https://www.psycopg.org/psycopg3/docs/basic/install.html\n       #installing-the-connection-pool\n\n\nCopyright (C) 2020 The Psycopg Team\n",
+        "description_content_type": "text/x-rst",
+        "author_email": "Daniele Varrazzo <daniele.varrazzo@gmail.com>",
+        "license_expression": "LGPL-3.0-only",
+        "license_file": [
+          "LICENSE.txt"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Operating System :: MacOS :: MacOS X",
+          "Operating System :: Microsoft :: Windows",
+          "Operating System :: POSIX",
+          "Programming Language :: Python :: 3 :: Only",
+          "Programming Language :: Python :: 3.10",
+          "Programming Language :: Python :: 3.11",
+          "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
+          "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: Implementation :: CPython",
+          "Programming Language :: Python :: Implementation :: PyPy",
+          "Topic :: Database",
+          "Topic :: Database :: Front-Ends",
+          "Topic :: Software Development",
+          "Topic :: Software Development :: Libraries :: Python Modules"
+        ],
+        "requires_dist": [
+          "typing-extensions>=4.6",
+          "anyio>=4.0; extra == \"test\"",
+          "mypy>=1.14; extra == \"test\"",
+          "pproxy>=2.7; extra == \"test\"",
+          "pytest>=6.2.5; extra == \"test\"",
+          "pytest-cov>=3.0; extra == \"test\"",
+          "pytest-randomly>=3.5; extra == \"test\""
+        ],
+        "requires_python": ">=3.10",
+        "project_url": [
+          "Homepage, https://psycopg.org/",
+          "Documentation, https://www.psycopg.org/psycopg3/docs/advanced/pool.html",
+          "Changes, https://psycopg.org/psycopg3/docs/news_pool.html",
+          "Code, https://github.com/psycopg/psycopg",
+          "Issue Tracker, https://github.com/psycopg/psycopg/issues",
+          "Funding, https://github.com/sponsors/dvarrazzo"
+        ],
+        "provides_extra": [
+          "test"
+        ]
+      }
+    },
+    {
+      "download_info": {
+        "url": "https://files.pythonhosted.org/packages/e5/6d/b53b99a9f2766d095985947a5782f1702cabb129a34f7a802d7197af832f/tzdata-2026.3-py2.py3-none-any.whl",
+        "archive_info": {
+          "hashes": {
+            "sha256": "dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931"
+          },
+          "hash": "sha256=dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931"
+        }
+      },
+      "is_direct": false,
+      "is_yanked": false,
+      "requested": false,
+      "metadata": {
+        "metadata_version": "2.4",
+        "name": "tzdata",
+        "version": "2026.3",
+        "dynamic": [
+          "license-file"
+        ],
+        "summary": "Provider of IANA time zone data",
+        "description": "tzdata: Python package providing IANA time zone data\n====================================================\n\nThis is a Python package containing ``zic``-compiled binaries for the IANA time\nzone database. It is intended to be a fallback for systems that do not have\nsystem time zone data installed (or don't have it installed in a standard\nlocation), as a part of `PEP 615 <https://www.python.org/dev/peps/pep-0615/>`_.\n\nThis repository generates a ``pip``-installable package, published on PyPI as\n`tzdata <https://pypi.org/project/tzdata>`_.\n\nFor more information, see `the documentation <https://tzdata.python.org>`_.\n",
+        "description_content_type": "text/x-rst",
+        "home_page": "https://github.com/python/tzdata",
+        "author": "Python Software Foundation",
+        "author_email": "datetime-sig@python.org",
+        "license": "Apache-2.0",
+        "license_file": [
+          "LICENSE",
+          "licenses/LICENSE_APACHE"
+        ],
+        "classifier": [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 3"
+        ],
+        "requires_python": ">=2",
+        "project_url": [
+          "Bug Reports, https://github.com/python/tzdata/issues",
+          "Source, https://github.com/python/tzdata",
+          "Documentation, https://tzdata.python.org"
+        ]
+      }
+    }
+  ],
+  "environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.14.6",
+    "os_name": "nt",
+    "platform_machine": "AMD64",
+    "platform_release": "11",
+    "platform_system": "Windows",
+    "platform_version": "10.0.29617",
+    "python_full_version": "3.14.6",
+    "platform_python_implementation": "CPython",
+    "python_version": "3.14",
+    "sys_platform": "win32"
+  }
+}

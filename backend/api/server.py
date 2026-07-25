@@ -7,12 +7,33 @@ from langchain_core.messages import HumanMessage
 from langgraph_orchestrator.workflow import app as workflow_app
 from api.contracts import ChatRequest
 
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException
+import jwt
+import os
+
 app = FastAPI(title="Pramiti OS API Bridge")
 
+# Security: JWT Authentication
+security = HTTPBearer()
+JWT_SECRET = os.getenv("APP_SECRET_KEY", "default-secret-for-dev")
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if os.getenv("ENVIRONMENT") == "development" and not os.getenv("APP_SECRET_KEY"):
+        # Allow pass-through in pure local dev if no secret is set, but warn
+        pass
+    else:
+        try:
+            payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=["HS256"])
+            return payload
+        except jwt.PyJWTError:
+            raise HTTPException(status_code=403, detail="Invalid authentication credentials")
+
 # Allow Next.js frontend to communicate with FastAPI
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,7 +87,7 @@ async def stream_langgraph_response(message: str):
             "data": json.dumps(payload)
         }
 
-@app.post("/chat/stream")
+@app.post("/chat/stream", dependencies=[Depends(verify_token)])
 async def chat_stream_endpoint(request: ChatRequest):
     return EventSourceResponse(stream_langgraph_response(request.message))
 

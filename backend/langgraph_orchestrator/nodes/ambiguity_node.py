@@ -12,7 +12,6 @@ from pydantic import BaseModel, Field
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from shared.security_config import get_groq_api_key
 from langgraph_orchestrator.state import AgentState
 

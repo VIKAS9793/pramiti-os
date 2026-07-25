@@ -1,117 +1,68 @@
 """Portfolio reasoning node module for LangGraph orchestration.
 
-This module acts as the Relationship Manager's intelligent co-pilot, analyzing 
-portfolio context and enforcing banking compliance rules before presenting 
-executive-ready insights.
+This module acts as the Relationship Manager's intelligent co-pilot.
+It strictly uses the LLM to extract intent from natural language, 
+and relies on the Core Banking Engine for deterministic financial math.
 """
 
+from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage
 from langchain_groq import ChatGroq
 import sys
 import os
+import json
 
 # Security: Enforce environment validation and inject injection scanner
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from shared.security_config import validate_environment, scan_for_injection, get_groq_api_key
 
 validate_environment()
 
 from mcp_servers.portfolio_server.server import get_client_portfolio
+from mcp_servers.cbs_server import get_client_kyc_and_balances
 from langgraph_orchestrator.state import AgentState
+from langgraph_orchestrator.services.core_banking_engine import CoreBankingEngine
 
-# Simulates local execution via cloud endpoint for PoC performance.
-# In production deployments, this relies on on-premise sovereign models.
 llm = ChatGroq(
     model=os.getenv("GROQ_REASONING_MODEL", "llama-3.3-70b-versatile"),
     api_key=get_groq_api_key(),
     temperature=0.0,
 )
 
-system_prompt = """You are the Portfolio Advisory Agent for Pramiti OS — the Relationship Manager's (RM) intelligent co-pilot.
-Your job is to present clear, executive-ready portfolio insights in the language a Private Wealth RM uses daily.
+class RebalanceIntent(BaseModel):
+    """Schema for extracting the RM's trading intent."""
+    action: str = Field(description="The action being performed, e.g., 'reallocate', 'buy', 'sell'")
+    amount_inr: float = Field(description="The precise absolute amount to move in INR. Convert Lakhs/Crores to exact digits (e.g. 10 Lakhs = 1000000.0).")
+    source_asset: str = Field(description="The asset class to sell or move money from (e.g., 'Equity', 'Debt'). Use 'None' if NA.")
+    destination_asset: str = Field(description="The asset class to buy or move money to (e.g., 'Debt', 'Equity'). Use 'None' if NA.")
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RULE 1 — INDIAN CURRENCY (ABSOLUTE, NON-NEGOTIABLE)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-You MUST convert ALL monetary values to standard Indian units before outputting:
-  • Amounts < 1 Crore  → format as "₹X.XX Lakh"   (e.g. ₹25.00 Lakh)
-  • Amounts ≥ 1 Crore  → format as "₹X.XX Cr"      (e.g. ₹1.24 Cr, ₹3.15 Cr)
-
-You are STRICTLY FORBIDDEN from writing raw INR numbers like:
-  ✗ ₹31,500,000.00   ✗ 31922500 INR   ✗ ₹12,400,000
-
-Every single number in your output that represents money MUST use Lakh or Cr notation.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RULE 2 — BANKER-FIRST LANGUAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Use plain banking vocabulary the RM uses on the phone with clients.
-NEVER use engineering or system terms. Specific substitutions:
-  ✗ "reallocation amount"     → ✓ "amount to move"
-  ✗ "parameter"               → ✓ "value" / "setting"
-  ✗ "execute"                 → ✓ "action" / "move forward"
-  ✗ "I've rebalanced"         → ✓ "I've prepared a proposal for your approval"
-  ✗ "I have shifted"          → ✓ "I have prepared a proposal to shift"
-  ✗ "retrieved regulatory"    → never say this phrase
-  ✗ "simulated"               → ✓ "preview" / "what this looks like"
-  ✗ "validated"               → ✓ "cleared"
-  ✗ "non-compliant"           → ✓ "flagged for review"
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RULE 3 — REBALANCING PROPOSAL FORMAT (MANDATORY TABLE STRUCTURE)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-When presenting a rebalancing proposal, use EXACTLY this format:
-
-## Rebalancing Proposal
-
-**One sentence plain-English summary of what you are doing.**
-
-| Asset Class | Current Value | Current % | Amount to Move | New Value | New % | vs. Target |
-|---|---|---|---|---|---|---|
-| Equity | ₹X.XX Cr | X% | -₹X.XX Lakh | ₹X.XX Cr | X% | Target: X% |
-| Debt | ₹X.XX Cr | X% | +₹X.XX Lakh | ₹X.XX Cr | X% | Target: X% |
-| Cash | ₹X.XX Lakh | X% | — | ₹X.XX Lakh | X% | On target |
-
-Then add 2–3 bullet points of plain-English context (no paragraphs):
-- **What changes:** One line on what moves where
-- **Why it matters:** One line on the client's mandate alignment
-- **After this move:** One line on new allocation vs. target
-
-Then close with the sign-off line (ALWAYS required when proposing a trade):
-"This needs your final sign-off before it goes through — here's why it's safe to approve"
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RULE 4 — ZERO INFERENCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-You are forbidden from inventing financial figures. If data is missing, output:
-"I don't have that information for this client — please check the portfolio system."
-
-Client Portfolio Context:
-{client_context}
+system_prompt = """You are an Intent Extractor for the Pramiti OS Advisory Copilot.
+Your ONLY job is to parse the user's natural language input and extract their trading intent.
+If they say "reallocate 10 Lakhs from equity to debt", you extract amount=1000000.0, source='Equity', destination='Debt'.
+DO NOT do any math or generate conversational text. Just extract the structured data.
 """
 
+def format_currency(value: float) -> str:
+    """Format INR strictly into Lakhs or Crores."""
+    if value >= 10000000:
+        return f"₹{value / 10000000:.2f} Cr"
+    else:
+        return f"₹{value / 100000:.2f} Lakh"
 
 def portfolio_node(state: AgentState) -> dict:
-    """Analyzes portfolio context, enforces compliance rules, and generates proposals.
-    
-    This function processes the RM's natural language input, interfaces with the 
-    MCP portfolio server for PII-scrubbed context, and evaluates if the requested 
-    action triggers high-risk execution criteria requiring human validation.
+    """Extracts intent and deterministically computes portfolio shifts.
     
     Args:
-        state: The current state of the LangGraph workflow, containing message history.
+        state: The current state of the LangGraph workflow.
         
     Returns:
-        dict: A dictionary containing the LLM's generated response `messages`, 
-              the `client_context` retrieved, and a boolean `requires_approval` flag.
+        dict: Updated state with the exact deterministic markdown table response.
     """
     messages = state.get("messages", [])
     
-    # Extract client ID for the PoC
     client_id = "CLI-1001"
+    cbs_client_id = "CLIENT-001"
 
-    # Normalize message content for safe processing
     raw_content = messages[-1].content
     last_msg_str: str = (
         raw_content if isinstance(raw_content, str)
@@ -119,44 +70,90 @@ def portfolio_node(state: AgentState) -> dict:
     )
     last_msg = last_msg_str.upper()
 
-    # Security Gate: Scan for prompt injection before LLM or MCP invocation
     if scan_for_injection(last_msg_str):
         return {
-            "messages": [AIMessage(content=(
-                "Request blocked: Potential adversarial input detected. "
-                "This incident has been logged."
-            ))],
+            "messages": [AIMessage(content="Request blocked: Potential adversarial input detected. This incident has been logged.")],
             "requires_approval": False,
         }
 
     if "CLI-" in last_msg:
-        # Extract explicit client ID pattern
         start = last_msg.find("CLI-")
         client_id = last_msg[start:start+8]
+        if client_id == "CLI-1002":
+            cbs_client_id = "CLIENT-002"
 
-    # Fetch data from the MCP Server (applies PII masking implicitly)
     client_context = get_client_portfolio(client_id)
+    cbs_context = get_client_kyc_and_balances(cbs_client_id)
     
-    # Evaluate high-risk execution thresholds requiring human validation
     requires_approval = False
     risk_keywords = ["BUY", "SELL", "REALLOCATE", "EXECUTE", "LIQUIDATE", "SHIFT", "REBALANCE"]
     if any(keyword in last_msg.upper() for keyword in risk_keywords):
         requires_approval = True
-    
+        
+    # Extractor LLM
+    structured_llm = llm.with_structured_output(RebalanceIntent)
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
         ("placeholder", "{messages}")
     ])
+    chain = prompt | structured_llm
     
-    chain = prompt | llm
+    intent: RebalanceIntent = chain.invoke({"messages": messages})
     
-    response = chain.invoke({
-        "messages": messages,
-        "client_context": client_context
-    })
+    # Deterministic Engine
+    new_assets, compliance_verdict = CoreBankingEngine.calculate_rebalance(
+        portfolio_context=client_context,
+        action=intent.action,
+        amount_inr=intent.amount_inr,
+        source_asset=intent.source_asset,
+        destination_asset=intent.destination_asset
+    )
+    
+    # Programmatically construct output
+    action_desc = f"I have prepared a proposal to shift {format_currency(intent.amount_inr)} from {intent.source_asset.capitalize()} to {intent.destination_asset.capitalize()}."
+    
+    table_lines = [
+        "## Rebalancing Proposal",
+        "",
+        f"**{action_desc}**",
+        "",
+        "| Asset Class | Current Value | Current % | Amount to Move | New Value | New % | vs. Target |",
+        "|---|---|---|---|---|---|---|"
+    ]
+    
+    for asset in new_assets:
+        cls_name = asset["asset_class"].capitalize()
+        curr_val = format_currency(asset["original_value_inr"])
+        curr_pct = f"{asset['original_percentage']}%"
+        target_pct = asset["target_percentage"]
+        new_val = format_currency(asset["value_inr"])
+        new_pct = f"{asset['percentage']}%"
+        
+        move = "—"
+        if cls_name.lower() == intent.source_asset.lower():
+            move = f"-{format_currency(intent.amount_inr)}"
+        elif cls_name.lower() == intent.destination_asset.lower():
+            move = f"+{format_currency(intent.amount_inr)}"
+            
+        vs_target = "On target" if asset['percentage'] == target_pct else f"Target: {target_pct}%"
+        
+        table_lines.append(f"| {cls_name} | {curr_val} | {curr_pct} | {move} | {new_val} | {new_pct} | {vs_target} |")
+        
+    table_lines.extend([
+        "",
+        "- **What changes:** Shifting funds to realign with the model portfolio mandate.",
+        "- **Why it matters:** Eliminates drift and strictly aligns with the client's risk profile.",
+        "",
+        "This needs your final sign-off before it goes through."
+    ])
+    
+    response_text = "\n".join(table_lines)
+    
+    # Append raw JSON payload for compliance_node to parse
+    response_text += f"\n\n<!-- DETERMINISTIC_COMPLIANCE: {json.dumps(compliance_verdict)} -->"
     
     return {
-        "messages": [response],
+        "messages": [AIMessage(content=response_text)],
         "client_context": client_context,
         "requires_approval": requires_approval
     }

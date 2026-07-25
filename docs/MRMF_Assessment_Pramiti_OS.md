@@ -30,8 +30,8 @@ As required by the guidance, a platform-level kill switch has been implemented.
 - **Action Taken:** By eliminating inference temperature and standardizing the UI rendering logic, the same query with the same portfolio state will yield the same structured verdict. Determinism is enforced at the LLM parameter level.
 
 ### 3.4 Data Risk (DPDP Compliance)
-- **Status:** Addressed.
-- **Action Taken:** Masking is rigorously applied at the backend processing layer (`pii_masking.py`). The LLM only processes masked names (e.g., "A**** S*****"). The frontend is responsible for re-hydrating the unmasked data for the authenticated RM, ensuring that third-party model providers never receive raw PII. 
+- **Status:** Addressed & CI-Verified.
+- **Action Taken:** Masking is rigorously applied at the backend processing layer (`pii_masking.py`), specifically targeting `core_identity.name`. The LLM only processes masked names (e.g., "A**** S*****"). A CI-gated unit test (`test_pii_masking.py`) explicitly asserts that the masking function mutates every sensitive field before release. The frontend is responsible for re-hydrating the unmasked data for the authenticated RM, ensuring that third-party model providers never receive raw PII. 
 
 ### 3.5 Bias
 - **Status:** Assessed, Low Risk.

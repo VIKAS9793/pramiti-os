@@ -21,9 +21,9 @@ def mask_client_pii(portfolio_data: dict) -> dict:
         dict: A deep copy of the portfolio data with the `client_name` field masked.
     """
     masked_data = copy.deepcopy(portfolio_data)
-    if "client_name" in masked_data:
-        name_parts = masked_data["client_name"].split(" ")
+    if "core_identity" in masked_data and "name" in masked_data["core_identity"]:
+        name_parts = masked_data["core_identity"]["name"].split(" ")
         masked_parts = [f"{part[0]}{'*' * (len(part) - 1)}" for part in name_parts if len(part) > 0]
-        masked_data["client_name"] = " ".join(masked_parts)
+        masked_data["core_identity"]["name"] = " ".join(masked_parts)
     
     return masked_data

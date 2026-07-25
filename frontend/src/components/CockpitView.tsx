@@ -7,6 +7,7 @@ import { StatusPill } from './StatusPill';
 interface CockpitViewProps {
   setSelectedClient: (client: string) => void;
   setViewMode: (mode: 'cockpit' | 'drift_detail' | 'slider_drawer' | 'chat') => void;
+  setInputValue: (val: string) => void;
   hasData?: boolean;
 }
 
@@ -22,17 +23,17 @@ interface CockpitViewProps {
  * @param {boolean} [props.hasData=true] - Toggles empty state for the dashboard.
  * @returns {JSX.Element} The rendered Cockpit dashboard.
  */
-export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: CockpitViewProps) {
+export function CockpitView({ setSelectedClient, setViewMode, setInputValue, hasData = true }: CockpitViewProps) {
   if (!hasData) {
     return (
       <div className={styles.cockpitView}>
         <div className={styles.welcomeBanner}>
           <div>
-            <h2>Good Morning, Vikram 👋</h2>
-            <p>Friday, 05 Aug 2026 | Book AUM: <strong>₹0.00</strong> (0 Active Accounts)</p>
+            <h2>Good Morning, Vikas 👋</h2>
+            <p>Friday, 05 Aug 2026 | Book AUM: <strong>₹0.00</strong> (0 Active Folios / Demat Accounts)</p>
           </div>
         </div>
-        <Card title="Clients Needing Attention">
+        <Card title="Actionable Client Triggers">
           <div className={styles.emptyState}>
             <div className={styles.emptyStateIcon}>🎉</div>
             <p>All client portfolios are within mandated thresholds.</p>
@@ -47,8 +48,8 @@ export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: 
     <div className={styles.cockpitView}>
       <div className={styles.welcomeBanner}>
         <div>
-          <h2>Good Morning, Vikram 👋</h2>
-          <p>Friday, 05 Aug 2026 | Book AUM: <strong>₹42.50 Cr</strong> (34 Active Accounts)</p>
+          <h2>Good Morning, Vikas 👋</h2>
+          <p>Friday, 05 Aug 2026 | Book AUM: <strong>₹42.50 Cr</strong> (34 Active Folios / Demat Accounts)</p>
         </div>
         <div className={styles.bannerBadge}>
           <span>3 Action Required Alerts</span>
@@ -65,9 +66,9 @@ export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: 
               <div className={`${styles.alertIcon} ${styles.alertIconRed}`} />
               <div className={styles.alertText}>
                 <strong>Aarav Sharma</strong>
-                <p>Portfolio deviation &gt; 15% — equity overweight</p>
+                <p>Asset Allocation Drift &gt; 15% — equity overweight</p>
               </div>
-              <button className={styles.actionPill}>Review</button>
+              <button className={styles.actionPill}>Initiate Portfolio Review</button>
             </div>
 
             <div className={styles.alertItemItem}>
@@ -76,7 +77,11 @@ export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: 
                 <strong>Priya Patel</strong>
                 <p>₹25.00 Lakh awaiting deployment</p>
               </div>
-              <button className={styles.actionPill}>Deploy</button>
+              <button className={styles.actionPill} onClick={() => {
+                setSelectedClient("Priya Patel");
+                setInputValue("Help me deploy ₹25.00 Lakh for Priya Patel");
+                setViewMode("chat");
+              }}>Deploy Capital (Non-Discretionary)</button>
             </div>
 
             <div className={styles.alertItemItem}>
@@ -85,7 +90,11 @@ export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: 
                 <strong>Kabir Singh</strong>
                 <p>SIP payment pending — auto-retry 07 Aug</p>
               </div>
-              <button className={styles.actionPill}>Fix</button>
+              <button className={styles.actionPill} onClick={() => {
+                setSelectedClient("Kabir Singh");
+                setInputValue("How do I resolve the TAT exception for Kabir Singh's SIP?");
+                setViewMode("chat");
+              }}>Resolve TAT Exception</button>
             </div>
           </div>
         </Card>
@@ -114,16 +123,16 @@ export function CockpitView({ setSelectedClient, setViewMode, hasData = true }: 
         </Card>
       </div>
 
-      <Card title="Clients Needing Attention">
+      <Card title="Actionable Client Triggers">
         <table className={styles.globalTable}>
           <thead>
             <tr>
               <th>Client Name</th>
-              <th>Total AUM</th>
-              <th>Target Mix</th>
-              <th>Current Mix</th>
+              <th>Assets Under Management (AUM)</th>
+              <th>Model Portfolio</th>
+              <th>Current Allocation</th>
               <th>Max Variance</th>
-              <th>System Action</th>
+              <th>Recommended Intervention</th>
             </tr>
           </thead>
           <tbody>

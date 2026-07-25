@@ -1,40 +1,31 @@
+"""Unit tests for PII masking.
+Ensure sensitive data is scrubbed before passing to LLMs (DPDP compliance).
 """
-test_pii_masking.py — Unit tests for DPDP Act PII masking utility.
-Per pramiti-os-standards: atomic unit tests using pytest.
-"""
+
 import pytest
 from mcp_servers.portfolio_server.utils.pii_masking import mask_client_pii
 
-
-class TestPiiMasking:
-    """Tests that exact names are never leaked to the LLM context."""
-
-    def test_name_is_not_masked_per_rm_feedback(self):
-        """Full name must remain intact per RM requirements."""
-        data = {"core_identity": {"name": "Vikram Desai"}}
-        result = mask_client_pii(data)
-        assert result["core_identity"]["name"] == "Vikram Desai"
-
-    def test_original_data_not_mutated(self):
-        """mask_client_pii must return the data without masking."""
-        data = {"core_identity": {"name": "Aarav Sharma"}}
-        result = mask_client_pii(data)
-        assert result["core_identity"]["name"] == "Aarav Sharma"
-
-    def test_original_data_not_mutated(self):
-        """mask_client_pii must return a deep copy — original dict must be unchanged."""
-        original = {"core_identity": {"name": "Meera Patel"}}
-        mask_client_pii(original)
-        assert original["core_identity"]["name"] == "Meera Patel"
-
-    def test_missing_name_field_does_not_crash(self):
-        """Must handle data without a name field gracefully."""
-        data = {"core_identity": {"tier": "Retail"}}
-        result = mask_client_pii(data)
-        assert result["core_identity"]["tier"] == "Retail"
-
-    def test_single_letter_name_is_safe(self):
-        """Single-character name components must not crash the masker."""
-        data = {"core_identity": {"name": "A B"}}
-        result = mask_client_pii(data)
-        assert result["core_identity"]["name"] == "A B"
+def test_mask_client_pii_masks_core_identity_name():
+    """Verify that the core_identity.name field is properly masked."""
+    # Given
+    mock_data = {
+        "portfolio_id": "P-123",
+        "core_identity": {
+            "name": "Aarav Sharma",
+            "pan": "ABCDE1234F"
+        },
+        "holdings": []
+    }
+    
+    # When
+    masked_data = mask_client_pii(mock_data)
+    
+    # Then
+    assert masked_data["core_identity"]["name"] == "A**** S*****"
+    assert masked_data["core_identity"]["pan"] == "ABCDE1234F" # Currently only name is masked
+    
+def test_mask_client_pii_no_mutation_if_no_identity():
+    """Verify it handles missing core_identity gracefully."""
+    mock_data = {"portfolio_id": "P-456"}
+    masked_data = mask_client_pii(mock_data)
+    assert masked_data == {"portfolio_id": "P-456"}

@@ -12,7 +12,6 @@ import sys
 import os
 
 # Security: Enforce environment validation and inject injection scanner
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from shared.security_config import validate_environment, scan_for_injection, get_groq_api_key
 
 validate_environment()

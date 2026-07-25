@@ -1,6 +1,6 @@
 # Pramiti OS
 
-![Pramiti OS Banner](https://raw.githubusercontent.com/VIKAS9793/pramiti-os/main/assets/images/project_banner.png)
+![Pramiti OS Banner](assets/images/project_banner.png)
 
 > **प्रमिति (Pramiti)** — Sanskrit: *valid, justified knowledge* — the accurate, well-founded understanding that results when a reliable means of knowing is applied to a real object, as distinct from guesswork, bias, or false impression.
 > 
@@ -18,6 +18,25 @@
 
 ---
 
+<details>
+<summary><b>📸 View Pramiti OS Interface Screenshots</b></summary>
+
+### My Day Dashboard
+![My Day Dashboard](assets/images/my_day_dashboard.png)
+
+### Ask Pramiti Chat Copilot
+![Ask Pramiti Chat Copilot](assets/images/ask_pramiti_chat.png)
+
+### Client Review
+![Client Review](assets/images/client_review.png)
+
+### Rebalance
+![Rebalance](assets/images/rebalance.png)
+
+</details>
+
+---
+
 ## 1. Project Motivation
 
 Relationship Managers (RMs) in wealth management often operate across multiple disconnected systems (CRM, Core Banking, market terminals). This fragmentation requires manual data aggregation during client calls, increasing the risk of error and reducing advisory time.
@@ -27,6 +46,8 @@ Simultaneously, standard LLM wrappers pose significant regulatory challenges in 
 2. **RBI MRMF (Model Risk)**: Autonomous algorithmic execution in high-risk financial scenarios without human oversight is prohibited.
 
 This PoC explores how an agentic architecture (LangGraph + MCP) can securely bridge internal APIs while enforcing compliance guardrails.
+
+> **For how this PoC scales to production as a layer on existing bank infrastructure, see the [Scale and Integration Strategy](docs/04-design-and-architecture/Scale-and-Integration-Strategy.md) document.**
 
 ---
 
@@ -57,8 +78,9 @@ Pramiti OS utilizes a decoupled architecture to separate reasoning (LLM), integr
 
 Detailed specifications, research, and technical designs are maintained in the `/docs` directory:
 
-* [System Architecture & Technical Design](https://github.com/VIKAS9793/pramiti-os/blob/main/docs/04-design-and-architecture/System%20Architecture%20&%20Technical%20Design.md)
-* [Developer Setup & Troubleshooting Guide](https://github.com/VIKAS9793/pramiti-os/blob/main/docs/04-design-and-architecture/Developer%20Setup%20and%20Troubleshooting.md)
-* [Pramiti OS Core PRD](https://github.com/VIKAS9793/pramiti-os/blob/main/docs/03-prds-and-specs/Pramiti%20OS%20PRD.md)
-* [Product Strategy & Roadmap](https://github.com/VIKAS9793/pramiti-os/blob/main/docs/01-strategy-and-vision/Product%20Strategy%20and%20Vision.md)
-* [User Personas & JTBD Research](https://github.com/VIKAS9793/pramiti-os/blob/main/docs/02-research-and-discovery/User%20Personas%20and%20JTBD.md)
+* [**Scale and Integration Strategy**](docs/04-design-and-architecture/Scale-and-Integration-Strategy.md) — **⭐ Canonical reference for PoC-to-production scaling.** Explains how Pramiti OS integrates with CBS, CRM, and internal systems as an additive layer (not a replacement), the current build-vs-target architecture reconciliation, and the phased production rollout plan. Read this before any integration or production-scaling work.
+* [System Architecture & Technical Design](docs/04-design-and-architecture/System%20Architecture%20&%20Technical%20Design.md)
+* [Developer Setup & Troubleshooting Guide](docs/04-design-and-architecture/Developer%20Setup%20and%20Troubleshooting.md)
+* [Pramiti OS Core PRD](docs/03-prds-and-specs/Pramiti%20OS%20PRD.md)
+* [Product Strategy & Roadmap](docs/01-strategy-and-vision/Product%20Strategy%20and%20Vision.md)
+* [User Personas & JTBD Research](docs/02-research-and-discovery/User%20Personas%20and%20JTBD.md)

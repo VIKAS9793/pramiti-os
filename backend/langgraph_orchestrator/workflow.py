@@ -6,7 +6,9 @@ including MRMF compliance interrupts and ambiguity checkpoints.
 """
 
 from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.postgres import PostgresSaver
+from psycopg_pool import ConnectionPool
+import os
 from langgraph_orchestrator.state import AgentState
 from langgraph_orchestrator.nodes.supervisor_node import supervisor_node
 from langgraph_orchestrator.nodes.portfolio_node import portfolio_node
@@ -87,7 +89,8 @@ def compile_workflow():
     
     workflow.add_edge(START, "supervisor")
     
-    memory = InMemorySaver()
+    from langgraph.checkpoint.memory import MemorySaver
+    memory = MemorySaver()
     
     app = workflow.compile(
         checkpointer=memory,

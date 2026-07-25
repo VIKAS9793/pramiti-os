@@ -51,12 +51,12 @@ export function SliderDrawer({
   return (
     <div className={styles.sliderView}>
       <div className={styles.contextStrip}>
-        Reviewing: {selectedClient} — Equity 15% overweight — started 3 min ago
+        Client Context: {selectedClient} — Equity Allocation Breach (15% overweight)
       </div>
 
       <div className={styles.driftHeader}>
         <div>
-          <h2>Adjust Rebalancing</h2>
+          <h2>Realign to Mandate</h2>
           <p>Fine-tune proposed weights before committing.</p>
         </div>
       </div>
@@ -96,19 +96,35 @@ export function SliderDrawer({
 
         {/* Simulated Shift Preview */}
         <div className={styles.simulationPreview}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4>What This Looks Like</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h4>Post-Trade Asset Allocation</h4>
             <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(37, 99, 235, 0.2)', border: '1px solid rgba(37, 99, 235, 0.4)', borderRadius: '4px', color: '#CBD5E1', textTransform: 'uppercase' }}>
               Preview — Not Yet Executed
             </span>
           </div>
-          <div className={styles.simRow}>
-            <span>Equity Shift:</span>
-            <span>[ 65.0% ] ═════════► [ <strong>{newEquityPct}%</strong> ] (Target: 50.0%)</span>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <div className={styles.driftLabel}>
+              <span>Equity Shift <span className={styles.driftLabelMeta}>(Target: 50.0%)</span></span>
+              <span>65.0% ➔ <strong>{newEquityPct}%</strong></span>
+            </div>
+            <div className={styles.progressTrack}>
+              <div className={styles.progressFillBlue} style={{ width: `${newEquityPct}%`, transition: 'width 0.3s ease' }}></div>
+              <div className={styles.targetIndicator} style={{ left: '50.0%' }} title="Target: 50.0%"></div>
+              <div style={{ position: 'absolute', top: 0, bottom: 0, width: '2px', left: '65.0%', background: 'rgba(239, 68, 68, 0.5)', borderLeft: '2px dashed rgba(239,68,68,0.8)' }} title="Original: 65.0%"></div>
+            </div>
           </div>
-          <div className={styles.simRow}>
-            <span>Debt Shift:</span>
-            <span>[ 25.0% ] ═════════► [ <strong>{newDebtPct}%</strong> ] (Target: 40.0%)</span>
+
+          <div>
+            <div className={styles.driftLabel}>
+              <span>Debt Shift <span className={styles.driftLabelMeta}>(Target: 40.0%)</span></span>
+              <span>25.0% ➔ <strong>{newDebtPct}%</strong></span>
+            </div>
+            <div className={styles.progressTrack}>
+              <div className={styles.progressFillBlue} style={{ width: `${newDebtPct}%`, transition: 'width 0.3s ease' }}></div>
+              <div className={styles.targetIndicator} style={{ left: '40.0%' }} title="Target: 40.0%"></div>
+              <div style={{ position: 'absolute', top: 0, bottom: 0, width: '2px', left: '25.0%', background: 'rgba(239, 68, 68, 0.5)', borderLeft: '2px dashed rgba(239,68,68,0.8)' }} title="Original: 25.0%"></div>
+            </div>
           </div>
         </div>
 

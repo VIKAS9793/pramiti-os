@@ -7,6 +7,48 @@ import { DriftDetail } from "../components/DriftDetail";
 import { SliderDrawer } from "../components/SliderDrawer";
 import { ChatCopilot } from "../components/ChatCopilot";
 
+const clientDataMap: Record<string, any> = {
+  "Aarav Sharma": {
+    aum: "₹4.85 Cr",
+    pnl: "+14.9%",
+    pnlClass: styles.positive,
+    risk: "Moderate-Aggressive",
+    tier: "Private Wealth Tier 1",
+    equity: 65,
+    debt: 25,
+    cash: 5,
+    alts: 5,
+    nextActionDate: "05 Aug 2026",
+    monthlyInflow: "₹1,00,000"
+  },
+  "Priya Patel": {
+    aum: "₹2.50 Cr",
+    pnl: "+8.4%",
+    pnlClass: styles.positive,
+    risk: "Aggressive",
+    tier: "Private Wealth Tier 2",
+    equity: 70,
+    debt: 0,
+    cash: 30,
+    alts: 0,
+    nextActionDate: "12 Aug 2026",
+    monthlyInflow: "₹50,000"
+  },
+  "Kabir Singh": {
+    aum: "₹85.00 Lakh",
+    pnl: "-2.1%",
+    pnlClass: styles.negative,
+    risk: "Moderate",
+    tier: "Wealth",
+    equity: 50,
+    debt: 40,
+    cash: 10,
+    alts: 0,
+    nextActionDate: "07 Aug 2026",
+    monthlyInflow: "₹25,000"
+  }
+};
+
 type ViewMode = "cockpit" | "drift_detail" | "slider_drawer" | "chat";
 
 export type Message = {
@@ -45,7 +87,7 @@ export default function PramitiRMInterface() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [requiresApproval, setRequiresApproval] = useState(false);
 
-  // Dynamic calculations based on slider (Total AUM: 1.24 Cr = 12,40,00,000 / 1.24 Cr = 124 Lakhs)
+  // Dynamic calculations based on slider (AUM: 1.24 Cr = 12,40,00,000 / 1.24 Cr = 124 Lakhs)
   const totalAumLakhs = 124;
   const currentEquityLakhs = 80.6;
   const currentDebtLakhs = 31;
@@ -77,7 +119,10 @@ export default function PramitiRMInterface() {
     try {
       const response = await fetch("http://localhost:8000/chat/stream", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_DEV_API_TOKEN || ""}`
+        },
         body: JSON.stringify({ message: rmMsg.content }),
       });
 
@@ -120,7 +165,7 @@ export default function PramitiRMInterface() {
        console.error("Chat error:", error);
        setMessages((prev) => prev.map(msg => {
           if (msg.id === sysMsgId) {
-             return { ...msg, content: "⚠️ System degraded. API bridge on port 8000 is unreachable. Please contact IT support." };
+             return { ...msg, content: "⚠️ Portfolio calculation engine is briefly offline. Re-trying in 10s... (Error Code: PRM-8000)" };
           }
           return msg;
        }));
@@ -129,6 +174,8 @@ export default function PramitiRMInterface() {
       setIsProcessing(false);
     }
   };
+
+  const currentClientData = clientDataMap[selectedClient] || clientDataMap["Aarav Sharma"];
 
   return (
     <div className={styles.container}>
@@ -172,6 +219,7 @@ export default function PramitiRMInterface() {
           <CockpitView 
             setSelectedClient={setSelectedClient}
             setViewMode={setViewMode}
+            setInputValue={setInputValue}
           />
         )}
 
@@ -202,10 +250,12 @@ export default function PramitiRMInterface() {
           <ChatCopilot 
             selectedClient={selectedClient}
             messages={messages}
+            setMessages={setMessages}
             inputValue={inputValue}
             setInputValue={setInputValue}
             isProcessing={isProcessing}
             requiresApproval={requiresApproval}
+            setRequiresApproval={setRequiresApproval}
             handleSend={handleSend}
             setViewMode={setViewMode}
           />
@@ -224,7 +274,7 @@ export default function PramitiRMInterface() {
               </div>
               <div>
                 <div className={styles.clientName}>{selectedClient}</div>
-                <div className={styles.clientTier}>Private Wealth Tier 1</div>
+                <div className={styles.clientTier}>{currentClientData.tier}</div>
               </div>
             </div>
           </div>
@@ -233,16 +283,16 @@ export default function PramitiRMInterface() {
           <div className={styles.widget}>
             <div className={styles.widgetTitle}>Portfolio Health</div>
             <div className={styles.statRow}>
-              <span className={styles.statLabel}>Total AUM</span>
-              <span className={styles.statValue}>₹1.24 Cr</span>
+              <span className={styles.statLabel}>Assets Under Management (AUM)</span>
+              <span className={styles.statValue}>{currentClientData.aum}</span>
             </div>
             <div className={styles.statRow}>
               <span className={styles.statLabel}>Unrealized P&L</span>
-              <span className={`${styles.statValue} ${styles.positive}`}>+14.2%</span>
+              <span className={`${styles.statValue} ${currentClientData.pnlClass || ''}`}>{currentClientData.pnl}</span>
             </div>
             <div className={styles.statRow}>
               <span className={styles.statLabel}>Risk Appetite</span>
-              <span className={styles.statValue}>Aggressive</span>
+              <span className={styles.statValue}>{currentClientData.risk}</span>
             </div>
           </div>
 
@@ -250,14 +300,16 @@ export default function PramitiRMInterface() {
           <div className={styles.widget}>
             <div className={styles.widgetTitle}>Asset Mix</div>
             <div className={styles.allocationBar}>
-              <div className={styles.allocEquity} style={{ width: '65%' }} title="Equity: 65%"></div>
-              <div className={styles.allocDebt} style={{ width: '25%' }} title="Debt: 25%"></div>
-              <div className={styles.allocCash} style={{ width: '10%' }} title="Cash: 10%"></div>
+              {currentClientData.equity > 0 && <div className={styles.allocEquity} style={{ width: `${currentClientData.equity}%` }} title={`Equity: ${currentClientData.equity}%`}></div>}
+              {currentClientData.debt > 0 && <div className={styles.allocDebt} style={{ width: `${currentClientData.debt}%` }} title={`Debt: ${currentClientData.debt}%`}></div>}
+              {currentClientData.cash > 0 && <div className={styles.allocCash} style={{ width: `${currentClientData.cash}%` }} title={`Cash: ${currentClientData.cash}%`}></div>}
+              {currentClientData.alts > 0 && <div className={styles.allocAlts} style={{ width: `${currentClientData.alts}%`, background: '#8b5cf6' }} title={`Alts: ${currentClientData.alts}%`}></div>}
             </div>
             <div className={styles.allocLegend}>
               <div><span className={styles.legendDot} style={{background: 'var(--accent)'}}></span>Equity</div>
               <div><span className={styles.legendDot} style={{background: 'var(--accent-border)'}}></span>Debt</div>
               <div><span className={styles.legendDot} style={{background: 'var(--border-muted)'}}></span>Cash</div>
+              {currentClientData.alts > 0 && <div><span className={styles.legendDot} style={{background: '#8b5cf6'}}></span>Alts</div>}
             </div>
           </div>
 
@@ -266,11 +318,11 @@ export default function PramitiRMInterface() {
             <div className={styles.widgetTitle}>Next Actions</div>
             <div className={styles.statRow}>
               <span className={styles.statLabel}>Next SIP Date</span>
-              <span className={styles.statValue}>05 Aug 2026</span>
+              <span className={styles.statValue}>{currentClientData.nextActionDate}</span>
             </div>
             <div className={styles.statRow}>
               <span className={styles.statLabel}>Monthly Inflow</span>
-              <span className={styles.statValue}>₹75,000</span>
+              <span className={styles.statValue}>{currentClientData.monthlyInflow}</span>
             </div>
           </div>
         </div>

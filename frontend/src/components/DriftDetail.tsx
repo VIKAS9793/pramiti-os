@@ -27,13 +27,13 @@ export function DriftDetail({ selectedClient, setViewMode, handleSend }: DriftDe
   return (
     <div className={styles.driftView}>
       <div className={styles.contextStrip}>
-        Reviewing: {selectedClient} — Equity 15% overweight — started 3 min ago
+        Client Context: {selectedClient} — Equity Allocation Breach (15% overweight)
       </div>
       
       <div className={styles.driftHeader}>
         <div>
-          <h2>Portfolio Off-Target — {selectedClient}</h2>
-          <p>Private Wealth Tier 1 · Total AUM: <strong>₹1.24 Cr</strong></p>
+          <h2>Asset Allocation Drift — {selectedClient}</h2>
+          <p>Private Wealth Tier 1 · Assets Under Management (AUM): <strong>₹1.24 Cr</strong></p>
         </div>
       </div>
 
@@ -90,15 +90,15 @@ export function DriftDetail({ selectedClient, setViewMode, handleSend }: DriftDe
         </div>
 
         <div className={styles.recommendationBanner}>
-          <strong>Suggested Action:</strong> Reallocate <strong>₹10,00,000 (₹10.00 Lakh)</strong> from Equity to Debt.
+          <strong>Advisory Recommendation:</strong> Reallocate <strong>₹10,00,000 (₹10.00 Lakh)</strong> from Equity to Debt.
         </div>
 
         <div className={styles.driftActionRow}>
           <Button variant="primary-large" onClick={() => setViewMode('slider_drawer')}>
-            ⚡ Adjust Rebalancing Amount
+            ⚡ Realign to Mandate
           </Button>
           <Button variant="secondary-large" onClick={() => handleSend("Reallocate 10 Lakhs from Equity to Debt")}>
-            💬 Open Copilot to Execute
+            💬 Execute via Advisory Copilot
           </Button>
         </div>
       </Card>

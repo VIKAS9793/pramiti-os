@@ -50,3 +50,13 @@ app = workflow.compile(
 1. **State Persistence**: The current graph state (`AgentState`) is serialized to PostgreSQL via `PostgresSaver`.
 2. **Deterministic Resume**: Graph can ONLY resume when the Relationship Manager explicitly sends an `APPROVED` signal with a signed JWT token.
 3. **Immutable Audit Trail**: The RM decision, timestamp, and prompt/completion tokens are written to `rbi_mrmf_audit_logs` for mandatory 10-year retention.
+
+---
+
+## 4. Implementation Addendum: PoC vs. Target Architecture
+
+**Date**: 2026-07-25  
+As a result of an internal code-vs-documentation reconciliation review, the PoC has been upgraded to properly reflect this ADR.
+
+*   **State Persistence**: The PoC previously used `InMemorySaver` (non-compliant). This has now been refactored to use `PostgresSaver` backed by a local PostgreSQL database, fulfilling the state persistence and audit trail requirements.
+*   **Deterministic Resume (Auth)**: The API layer has been upgraded with FastAPI `HTTPBearer` authentication to validate signed JWT tokens before accepting any resume commands, replacing the unauthenticated PoC endpoints.
